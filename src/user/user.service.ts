@@ -10,9 +10,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+  async createUser(data: Prisma.UserCreateInput): Promise<Partial<User>> {
     try {
-      return await this.prisma.user.create({ data });
+      const user = await this.prisma.user.create({ data });
+      const { username, email, id } = user;
+      return { username, email, id };
     } catch (error) {
       const DUPLICATE_KEY_CODE = 'P2002';
       const err: {

@@ -27,6 +27,7 @@ export class UserService {
       ) {
         throw new ConflictException('Email already exist!');
       } else {
+        console.log('ERROR: ', error);
         throw new InternalServerErrorException(
           'Something went wrong. Try again!',
         );

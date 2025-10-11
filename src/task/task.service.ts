@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -27,6 +28,9 @@ export class TaskService {
   async getTaskById(taskId: string) {
     try {
       const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+      if (!task) {
+        throw new NotFoundException(`Task with id ${taskId} is not found!`);
+      }
       return task;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -35,9 +39,10 @@ export class TaskService {
           throw new NotFoundException(`Task with id ${taskId} not found!`);
         }
       }
-      throw new InternalServerErrorException(
-        'Failed to get task. Please try again!',
-      );
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException('This is an invalid task ID');
+      }
+      throw error;
     }
   }
 
